@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript Quiz</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: Arial;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: flex-start;
+    background: linear-gradient(0deg, rgba(19,41,61,1) 0%, rgba(237,245,249,1) 63%);
+  }
+</style>
+
+</head>
+<body>
+  <h1>JavaScript Fundamentals Quiz</h1>
+  <div 
+  id="quiz-container">
+    <button id="start-button">Start Quiz</button>
+    <div id="question"></div>
+    <div id="options"></div>
+    <input type="text" id="initials" placeholder="Your Initials">
+    <button id="submit-score">Submit Score</button>
+  </div>
+
+  <div 
+  id="score-container" style="display: none;">
+    <h2>Final Score</h2>
+    <p id="final-score"></p>
+  </div>
+
+  <div
+   id="js_timer">
+    <div id="timer">
+      00:00
+    </div>
+    <button>pause</button>
+  </div>
+
+  <div 
+  class="win"></div>
+  <div 
+  class="lose"></div>
+  <button class="reset-button">Reset Game</button>
+ <script>
+    
+    const questions = [
+      {
+        question: "How to write an IF statement in JavaScript?",
+        options: ["if i =5 then", "if (i = = 5)", "if i == 5 then", "if i = 5"],
+        correctAnswer: "if i = 5 then"
+      },
+      {
+        question: "How can you add a comment in a JavaScript?",
+        options: ["This is a comment", "<!--This is a comment-->", "// This is a comment"],
+        correctAnswer: "// This is a comment"
+      },
+      {
+        question: "Inside which HTML element do we put the JavaScript?",
+        options: ["<js>", "<scripting>", "<script>", "<javascript>"],
+        correctAnswer: "<script>"
+      },
+      {
+        question: "Where is the correct place to insert a JavaScript?",
+        options: ["The <body> Section", "The <head> Section", "Both the <head> and the <body> section", "none"],
+        correctAnswer: "Both the <head> and the <body> section"
+      },
+      {
+        question: "The external JavaScript file must contain the <script> tag.",
+        options: ["True", "False"],
+        correctAnswer: "True"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let timeLeft = 60;
+    let timerInterval;
+    let score = 0;
+
+    const startButton = document.getElementById("start-button");
+    const quizContainer = document.getElementById("quiz-container");
+    const questionElement = document.getElementById("question");
+    const optionsElement = document.getElementById("options");
+    const submitScoreButton = document.getElementById("submit-score");
+    const initialsInput = document.getElementById("initials");
+    const finalScoreElement = document.getElementById("final-score");
+    const scoreContainer = document.getElementById("score-container");
+
+    startButton.addEventListener("click", startQuiz);
+    submitScoreButton.addEventListener("click", saveScore);
+
+
+    function startQuiz() {
+      quizContainer.style.display = "block";
+      startButton.style.display = "none";
+      startTimer();
+      showQuestion();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          endQuiz();
+        }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      const question = questions[currentQuestionIndex];
+      questionElement.textContent = question.question;
+      optionsElement.innerHTML = "";
+
+      question.options.forEach((option, index) => {
+        const optionButton = document.createElement("button");
+        optionButton.textContent = option;
+        optionButton.addEventListener("click", () => checkAnswer(option));
+        optionsElement.appendChild(optionButton);
+      });
+    }
+
+    function checkAnswer(answer) {
+      const question = questions[currentQuestionIndex];
+      if (answer === question.correctAnswer) {
+        score++;
+      } else {
+        timeLeft -= 10; // Deduct 10 seconds for incorrect answer
+      }
+
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      clearInterval(timerInterval);
+      quizContainer.style.display = "none";
+      scoreContainer.style.display = "block";
+      finalScoreElement.textContent = `Your final score is ${score}.`;
+    }
+
+    function saveScore() {
+      const initials = initialsInput.value;
+      // For this module, I'll use localStorage to store high scores
+      const highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+      highScores.push({ initials, score });
+      localStorage.setItem("highScores", JSON.stringify(highScores));
+      alert("Score saved!");
+      location.reload();
+    }
+  </script>
+</body>
+</html>
